@@ -54,6 +54,7 @@ class GateMk {
 
     RunSleep := 1000
     AutoSkipFightStatus := 1
+    NotSkipFight := false
 
     StatusBar := ''
 
@@ -234,6 +235,7 @@ class GateMk {
             this.ToolTip("发现战斗，暂停脚本，按下F8继续脚本", 10000000)
             KeyWait("F8", "D")
             this.ToolTip("流程继续")
+            this.NotSkipFight := true
         }
     }
 
@@ -297,6 +299,11 @@ class GateMk {
             }
         } else {
             for section in this.FightStepKey {
+                ; 不跳过战斗的话跳过下一个按键
+                if this.NotSkipFight {
+                    this.NotSkipFight := false
+                    continue
+                }
                 Sleep(1000)
                 while !this.CheckPixel(this.Leave) {
                     this.ExitFlag()
