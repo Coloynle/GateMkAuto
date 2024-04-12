@@ -469,11 +469,11 @@ Class GateMkGui {
                     return
                 } else {
                     if !this.FirstTag {
-                        FileAppend("`n", Path)
+                        FileAppend("`r`n", Path)
                     } else {
                         this.FirstTag := false
                     }
-                    FileAppend("[" . Name.Value . "]`n", Path)
+                    FileAppend("[" . Name.Value . "]`r`n", Path)
                     this.FirstInput := true
                 }
             }
