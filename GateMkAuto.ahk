@@ -443,8 +443,12 @@ Class GateMkGui {
         Hotkey "F9", Run, "On"
         Hotkey "F6", InputRun, "On"
         InputRun(GuiCtrlObj, *) {
+            if this.GateMk.Route = "通用" {
+                MsgBox "通用路线无法录入，需要先切换当前路线"
+                return
+            }
+            MsgBox "开始录入" . this.GateMk.Route . "路线"
             Path := this.GateMk.CurrentRouteIni . ".input"
-            MsgBox Path
             this.FirstTag := true
             if FileExist(Path) {
                 FileDelete(Path)
@@ -526,6 +530,7 @@ Class GateMkGui {
                 Hotkey 'n', "Off"
                 Hotkey 'e', "Off"
                 Hotkey 'c', "Off"
+                MsgBox "录入已完成，请重新点击确认路线，进行配置刷新"
             }
 
             CancelInput(*) {
@@ -536,6 +541,7 @@ Class GateMkGui {
                 Hotkey 'n', "Off"
                 Hotkey 'e', "Off"
                 Hotkey 'c', "Off"
+                MsgBox "录入已取消"
             }
         }
 
