@@ -139,7 +139,7 @@ class GateMk {
     ConfigIniInit() {
         this.RunSleep := IniRead(this.ConfigIniPath, "RunSleep", "Time")
         this.AutoSkipFightStatus := IniRead(this.ConfigIniPath, "SkipFight", "Status")
-        this.AllRoute := StrSplit(IniRead(this.ConfigIniPath, "AllRoute"),",")
+        this.AllRoute := StrSplit(IniRead(this.ConfigIniPath, "AllRoute"), ",")
     }
 
     SetCurrentRoute(Route) {
@@ -299,11 +299,6 @@ class GateMk {
             }
         } else {
             for section in this.FightStepKey {
-                ; 不跳过战斗的话跳过下一个按键
-                if this.NotSkipFight {
-                    this.NotSkipFight := false
-                    continue
-                }
                 Sleep(1000)
                 while !this.CheckPixel(this.Leave) {
                     this.ExitFlag()
@@ -311,6 +306,11 @@ class GateMk {
                 }
                 for index, key in this.FightStep[section] {
                     this.ExitFlag()
+                    ; 不跳过战斗的话跳过下一个按键
+                    if this.NotSkipFight {
+                        this.NotSkipFight := false
+                        continue
+                    }
                     this.ToolTip(section "-" index "-" key)
                     Send key
                     if key = "{Enter}" {
