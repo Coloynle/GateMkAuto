@@ -433,14 +433,15 @@ Class GateMkGui {
                 }
         }
 
-        StartButton := MyGui.AddButton("xs w380", "开始漫巡")
+        StartButton := MyGui.AddButton("xs w380", "开始漫巡(F9)")
         StartButton.OnEvent("Click", Run)
-        InputButton := MyGui.AddButton("xs w380", "开始录入")
+        InputButton := MyGui.AddButton("xs w380", "开始录入(F6)")
         InputButton.OnEvent("Click", InputRun)
         Run(GuiCtrlObj, *) {
             this.GateMk.Run()
         }
         Hotkey "F9", Run, "On"
+        Hotkey "F6", InputRun, "On"
         InputRun(GuiCtrlObj, *) {
             Path := this.GateMk.CurrentRouteIni . ".input"
             MsgBox Path
@@ -454,12 +455,15 @@ Class GateMkGui {
             Hotkey 'Enter', Enter, "On"
             Hotkey 'n', NewTag, "On"
             Hotkey 'e', EndInput, "On"
+            Hotkey 'c', CancelInput, "On"
 
             NewTag(*) {
+                Hotkey 'Enter', "Off"
                 Name := InputBox("请输入本段路线的名称，例如 1-01", "路线名称", "w220 h90")
-                if Name.Result = "Cancel"
+                Hotkey 'Enter', "On"
+                if Name.Result = "Cancel" {
                     return
-                else {
+                } else {
                     if !this.FirstTag {
                         FileAppend("`n", Path)
                     } else {
@@ -508,17 +512,30 @@ Class GateMkGui {
             }
 
             EndInput(*) {
-                if FileExist(this.CurrentRouteIni) {
-                    RoutePathBak := this.CurrentRouteIni . ".bak"
-                    FileCopy(this.CurrentRouteIni, RoutePathBak, true)
+                if FileExist(Path) {
+                    if FileExist(this.GateMk.CurrentRouteIni) {
+                        RoutePathBak := this.GateMk.CurrentRouteIni . ".bak"
+                        FileCopy(this.GateMk.CurrentRouteIni, RoutePathBak, true)
+                    }
+                    FileCopy(Path, this.GateMk.CurrentRouteIni, true)
                 }
-                FileCopy(Path, this.CurrentRouteIni, true)
                 Hotkey 'Up', "Off"
                 Hotkey 'Left', "Off"
                 Hotkey 'Right', "Off"
                 Hotkey 'Enter', "Off"
                 Hotkey 'n', "Off"
                 Hotkey 'e', "Off"
+                Hotkey 'c', "Off"
+            }
+
+            CancelInput(*) {
+                Hotkey 'Up', "Off"
+                Hotkey 'Left', "Off"
+                Hotkey 'Right', "Off"
+                Hotkey 'Enter', "Off"
+                Hotkey 'n', "Off"
+                Hotkey 'e', "Off"
+                Hotkey 'c', "Off"
             }
         }
 
