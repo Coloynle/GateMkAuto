@@ -336,6 +336,9 @@ Class GateMkGui {
     GateMk := ''
     StausBar := ''
     MyGui := ''
+    InputHotStatus := false
+    FirstTag := false
+    FirstInput := false
     FightIniMapKey := ["StarFight", "Esc", "LeaveFight1", "LeaveFight2", "Resume", "Avoid", "Verify", "Leave"]
     FightIniMap := Map("StarFight", "开始战斗", "Esc", "Esc", "LeaveFight1", "离开战斗1", "LeaveFight2", "离开战斗2", "Resume", "继续", "Avoid", "回避", "Verify", "确认", "Leave", "离开")
     fightIniGui := Map("StarFight", Map("C", "", "X", "", "Y", ""), "Esc", Map("C", "", "X", "", "Y", ""), "LeaveFight1", Map("C", "", "X", "", "Y", ""), "LeaveFight2", Map("C", "", "X", "", "Y", ""), "Resume", Map("C", "", "X", "", "Y", ""), "Avoid", Map("C", "", "X", "", "Y", ""), "Verify", Map("C", "", "X", "", "Y", ""), "Leave", Map("C", "", "X", "", "Y", ""))
@@ -432,15 +435,100 @@ Class GateMkGui {
 
         StartButton := MyGui.AddButton("xs w380", "开始漫巡")
         StartButton.OnEvent("Click", Run)
+        InputButton := MyGui.AddButton("xs w380", "开始录入")
+        InputButton.OnEvent("Click", InputRun)
         Run(GuiCtrlObj, *) {
             this.GateMk.Run()
         }
         Hotkey "F9", Run, "On"
+        InputRun(GuiCtrlObj, *) {
+            Path := this.GateMk.CurrentRouteIni . ".input"
+            MsgBox Path
+            this.FirstTag := true
+            if FileExist(Path) {
+                FileDelete(Path)
+            }
+            Hotkey 'Up', Up, "On"
+            Hotkey 'Left', Left, "On"
+            Hotkey 'Right', Right, "On"
+            Hotkey 'Enter', Enter, "On"
+            Hotkey 'n', NewTag, "On"
+            Hotkey 'e', EndInput, "On"
+
+            NewTag(*) {
+                Name := InputBox("请输入本段路线的名称，例如 1-01", "路线名称", "w220 h90")
+                if Name.Result = "Cancel"
+                    return
+                else {
+                    if !this.FirstTag {
+                        FileAppend("`n", Path)
+                    } else {
+                        this.FirstTag := false
+                    }
+                    FileAppend("[" . Name.Value . "]`n", Path)
+                    this.FirstInput := true
+                }
+            }
+
+            Up(*) {
+                Send "{Up}"
+                if !this.FirstInput {
+                    FileAppend(",", Path)
+                } else {
+                    this.FirstInput := false
+                }
+                FileAppend("{Up}", Path)
+            }
+            Left(*) {
+                Send "{Left}"
+                if !this.FirstInput {
+                    FileAppend(",", Path)
+                } else {
+                    this.FirstInput := false
+                }
+                FileAppend("{Left}", Path)
+            }
+            Right(*) {
+                Send "{Right}"
+                if !this.FirstInput {
+                    FileAppend(",", Path)
+                } else {
+                    this.FirstInput := false
+                }
+                FileAppend("{Right}", Path)
+            }
+            Enter(*) {
+                Send "{Enter}"
+                if !this.FirstInput {
+                    FileAppend(",", Path)
+                } else {
+                    this.FirstInput := false
+                }
+                FileAppend("{Enter}", Path)
+            }
+
+            EndInput(*) {
+                if FileExist(this.CurrentRouteIni) {
+                    RoutePathBak := this.CurrentRouteIni . ".bak"
+                    FileCopy(this.CurrentRouteIni, RoutePathBak, true)
+                }
+                FileCopy(Path, this.CurrentRouteIni, true)
+                Hotkey 'Up', "Off"
+                Hotkey 'Left', "Off"
+                Hotkey 'Right', "Off"
+                Hotkey 'Enter', "Off"
+                Hotkey 'n', "Off"
+                Hotkey 'e', "Off"
+            }
+        }
+
 
         Tab.UseTab(2)
-        RouteListBox := MyGui.AddListBox("h500 w100 Section", this.GateMk.AllRoute)
+        RouteListBox := MyGui.AddListBox("h470 w100 Section", this.GateMk.AllRoute)
         RouteListBox.OnEvent('Change', RouteLoad)
-        RouteEdit := MyGui.AddEdit("yp h495 w270", "")
+        InputHotButton := MyGui.AddButton("xs w100", "输入模式: 关闭")
+        InputHotButton.OnEvent('Click', InputHotSwitch)
+        RouteEdit := MyGui.AddEdit("ys h495 w270", "")
         StartButton := MyGui.AddButton("xs w380", "保存")
         StartButton.OnEvent('Click', SaveRouteConfig)
 
@@ -453,6 +541,36 @@ Class GateMkGui {
                 RouteContent := ""
             }
             RouteEdit.Text := RouteContent
+        }
+
+        InputHotSwitch(GuiCtrlObj, *) {
+            this.InputHotStatus := !this.InputHotStatus
+            if this.InputHotStatus {
+                Hotkey 'w', Up, "On"
+                Hotkey 'a', Left, "On"
+                Hotkey 'd', Right, "On"
+                Hotkey 'j', Enter, "On"
+                GuiCtrlObj.Text := "输入模式: 开启"
+            } else {
+                Hotkey 'w', "Off"
+                Hotkey 'a', "Off"
+                Hotkey 'd', "Off"
+                Hotkey 'j', "Off"
+                GuiCtrlObj.Text := "输入模式: 关闭"
+            }
+
+            Up(*) {
+                SendText "{Up},"
+            }
+            Left(*) {
+                SendText "{Left},"
+            }
+            Right(*) {
+                SendText "{Right},"
+            }
+            Enter(*) {
+                SendText "{Enter},"
+            }
         }
 
         SaveRouteConfig(GuiCtrlObj, *) {
