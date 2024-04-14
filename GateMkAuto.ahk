@@ -7,9 +7,7 @@ CoordMode "Pixel", "Window"
 GMGui := GateMkGui()
 GMGui.Show()
 
-F1:: GMGui.Show()
-F2:: GMGui.GateMk.Test()
-
+F7:: GMGui.Show()
 F10:: Pause -1
 F11:: GMGui.GateMk.Exit()
 F12:: ExitApp
@@ -361,7 +359,7 @@ Class GateMkGui {
         MyGui.AddText("x40 yp+20", "高:")
         this.GateMkGui["Height"] := MyGui.AddText("x100 yp w50", this.GateMk.Height)
         MyGui.AddText("x40 yp+20", "路线:")
-        this.GateMkGui["Route"] := MyGui.AddText("x100 yp w100", this.GateMk.Route)
+        this.GateMkGui["Route"] := MyGui.AddText("x100 yp w250", this.GateMk.Route)
         GetGateMkButton := MyGui.AddButton("x330 y100", "获取进程")
         GetGateMkButton.OnEvent("Click", GetGateMkObj)
 
