@@ -329,7 +329,7 @@ class GateMk {
 }
 
 Class GateMkGui {
-    Version := "v1.0"
+    Version := "v1.0.1"
     Title := "白荆回廊自动漫巡" . this.Version . " - 免费使用"
     GateMk := ''
     StausBar := ''
